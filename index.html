@@ -1,0 +1,892 @@
+<html lang="de"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cut/Bulk 2026 Tracker – Zielpfad &amp; Daily Check</title>
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --card:#141622;
+      --card2:#10121b;
+      --text:#e8e8ef;
+      --muted:#a8abbd;
+      --line:#2a2d3f;
+      --good:#2ecc71;
+      --warn:#f1c40f;
+      --bad:#e74c3c;
+      --accent:#7aa7ff;
+      --accent2:#b48cff;
+      --btn:#1f2340;
+      --btn2:#22284d;
+      --shadow: 0 8px 24px rgba(0,0,0,.35);
+      --radius: 16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background: radial-gradient(1200px 600px at 15% 0%, rgba(122,167,255,.18), transparent 60%),
+                  radial-gradient(1200px 600px at 85% 0%, rgba(180,140,255,.16), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+      font-family:var(--sans);
+      line-height:1.35;
+    }
+    header{
+      padding: 22px 18px 8px 18px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1{ margin:0 0 6px 0; font-size: 22px; letter-spacing:.2px;}
+    .sub{ color:var(--muted); font-size: 13px; margin:0 0 12px 0; }
+    main{
+      padding: 10px 18px 28px 18px;
+      max-width: 1200px;
+      margin: 0 auto;
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 14px;
+    }
+    @media (max-width: 980px){
+      main{ grid-template-columns: 1fr; }
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+    .card h2{
+      font-size: 14px;
+      margin: 0 0 10px 0;
+      color: #f0f0ff;
+      letter-spacing:.2px;
+    }
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 560px){
+      .grid2{ grid-template-columns: 1fr; }
+    }
+    label{ display:block; font-size: 12px; color: var(--muted); margin: 0 0 6px 0; }
+    input, textarea, select{
+      width:100%;
+      background: var(--card2);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      padding: 10px 10px;
+      outline: none;
+      font-size: 14px;
+    }
+    input[type="number"]{ font-family: var(--mono); }
+    textarea{ min-height: 70px; resize: vertical; }
+    .row{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      flex-wrap: wrap;
+    }
+    .btn{
+      background: linear-gradient(180deg, rgba(122,167,255,.18), rgba(122,167,255,.08));
+      border: 1px solid rgba(122,167,255,.25);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: transform .06s ease, background .2s ease;
+      user-select:none;
+    }
+    .btn:hover{ background: linear-gradient(180deg, rgba(122,167,255,.23), rgba(122,167,255,.10)); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.secondary{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .btn.danger{
+      background: linear-gradient(180deg, rgba(231,76,60,.20), rgba(231,76,60,.08));
+      border: 1px solid rgba(231,76,60,.25);
+    }
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      font-size: 12px;
+      color: var(--muted);
+      margin-right: 8px;
+    }
+    .small{ font-size: 12px; color: var(--muted); }
+    table{
+      width:100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      overflow:hidden;
+      border-radius: 14px;
+    }
+    th, td{
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      padding: 10px 8px;
+      text-align:left;
+      vertical-align: top;
+    }
+    th{ color: var(--muted); font-weight: 600; font-size: 12px;}
+    tr:hover td{ background: rgba(255,255,255,.02); }
+    canvas{
+      width: 100%;
+      height: 340px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+      display:block;
+    }
+    .footer{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 18px 22px 18px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .rightcol{ display:flex; flex-direction:column; gap: 14px; }
+    .fileinput{
+      display:flex; gap:8px; align-items:center; flex-wrap: wrap;
+    }
+    input[type="file"]{ padding: 8px; }
+    .mono{ font-family: var(--mono); }
+    .good{ color: var(--good); }
+    .warn{ color: var(--warn); }
+    .bad{ color: var(--bad); }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Cut/Bulk 2026 Tracker – Zielpfad &amp; Daily Check</h1>
+  <p class="sub">Cut-first (Start: 21.01.2026). Daten werden automatisch im Browser gespeichert (localStorage). Für „Datei speichern“ nutze <span class="mono">HTML exportieren (mit Daten)</span>.</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Dashboard</h2>
+    <div class="row" style="margin-bottom:10px">
+      <span class="pill">Heute: <span id="todayDate" class="mono">2026-01-21</span></span>
+      <span class="pill">Ziel (Target): <span id="todayTarget" class="mono">91.0 kg</span></span>
+      <span class="pill">Ist (Actual): <span id="todayActual" class="mono">91.0 kg</span></span>
+      <span class="pill">Δ (Ist−Ziel): <span id="todayDelta" class="mono good">+0.0 kg</span></span>
+      <span class="pill">7-Tage Ø: <span id="todayAvg7" class="mono">91.0 kg</span></span>
+    </div>
+
+    <canvas id="chart" width="1100" height="420"></canvas>
+    <p class="small" style="margin:10px 0 0 0;">
+      Graph: <b>Zielpfad</b> (Linie), <b>Ist</b> (Punkte) und <b>7-Tage Ø</b> (Linie). Der Zielpfad ist linear zwischen Milestones.
+    </p>
+  </section>
+
+  <aside class="rightcol">
+    <section class="card">
+      <h2>Neuer Tages-Eintrag</h2>
+      <div class="grid2">
+        <div>
+          <label for="entryDate">Datum</label>
+          <input id="entryDate" type="date">
+        </div>
+        <div>
+          <label for="entryWeight">Gewicht (kg)</label>
+          <input id="entryWeight" type="number" inputmode="decimal" step="0.1" placeholder="z. B. 89.6">
+        </div>
+        <div>
+          <label for="entryWaist">Taille (cm) – optional</label>
+          <input id="entryWaist" type="number" inputmode="decimal" step="0.1" placeholder="z. B. 92.0">
+        </div>
+        <div>
+          <label for="entrySteps">Steps – optional</label>
+          <input id="entrySteps" type="number" inputmode="numeric" step="1" placeholder="z. B. 9000">
+        </div>
+        <div>
+          <label for="entryCalories">Kalorien – optional</label>
+          <input id="entryCalories" type="number" inputmode="numeric" step="1" placeholder="z. B. 2400">
+        </div>
+        <div>
+          <label for="entryProtein">Protein (g) – optional</label>
+          <input id="entryProtein" type="number" inputmode="numeric" step="1" placeholder="z. B. 180">
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <label for="entryNote">Notiz – optional</label>
+        <textarea id="entryNote" placeholder="Training, Schlaf, Stress, Salz, etc."></textarea>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="saveEntryBtn">Eintrag speichern</button>
+        <button class="btn secondary" id="clearEntryBtn">Felder leeren</button>
+      </div>
+      <p class="small" style="margin:10px 0 0 0;">Tipp: Wiege dich möglichst morgens nüchtern (Trend zählt, nicht einzelne Tage).</p>
+    </section>
+
+    <section class="card">
+      <h2>Milestones (Zielpunkte)</h2>
+      <p class="small" style="margin-top:-2px">Passe hier deine Phasen an. Der Zielpfad wird automatisch neu berechnet.</p>
+      <div class="row" style="margin: 10px 0">
+        <button class="btn secondary" id="addMilestoneBtn">Milestone hinzufügen</button>
+        <button class="btn danger" id="resetMilestonesBtn">Standard wiederherstellen</button>
+      </div>
+      <div style="overflow:auto; max-height: 260px;">
+        <table id="milestoneTable">
+          <thead>
+            <tr>
+              <th style="width:40%">Datum</th>
+              <th style="width:35%">Zielgewicht (kg)</th>
+              <th style="width:25%">Aktion</th>
+            </tr>
+          </thead>
+          <tbody><tr><td><input type="date"></td><td><input type="number" step="0.1"></td><td><button class="btn danger">Löschen</button></td></tr><tr><td><input type="date"></td><td><input type="number" step="0.1"></td><td><button class="btn danger">Löschen</button></td></tr><tr><td><input type="date"></td><td><input type="number" step="0.1"></td><td><button class="btn danger">Löschen</button></td></tr><tr><td><input type="date"></td><td><input type="number" step="0.1"></td><td><button class="btn danger">Löschen</button></td></tr><tr><td><input type="date"></td><td><input type="number" step="0.1"></td><td><button class="btn danger">Löschen</button></td></tr><tr><td><input type="date"></td><td><input type="number" step="0.1"></td><td><button class="btn danger">Löschen</button></td></tr><tr><td><input type="date"></td><td><input type="number" step="0.1"></td><td><button class="btn danger">Löschen</button></td></tr><tr><td><input type="date"></td><td><input type="number" step="0.1"></td><td><button class="btn danger">Löschen</button></td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Daten verwalten</h2>
+      <div class="row" style="margin-bottom:10px">
+        <button class="btn secondary" id="exportHtmlBtn">HTML exportieren (mit Daten)</button>
+        <button class="btn secondary" id="exportJsonBtn">JSON exportieren</button>
+        <button class="btn secondary" id="exportCsvBtn">CSV exportieren</button>
+      </div>
+      <div class="fileinput">
+        <input id="importJsonInput" type="file" accept="application/json">
+        <button class="btn" id="importJsonBtn">JSON importieren</button>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn danger" id="wipeAllBtn">Alles löschen (Reset)</button>
+      </div>
+      <p class="small" style="margin-top:10px">Hinweis: Browser-Speicher ist pro Gerät/Browser. Für Backup/Wechsel: JSON oder HTML Export nutzen.</p>
+    </section>
+  </aside>
+
+  <section class="card" style="grid-column: 1 / -1;">
+    <h2>Daily Log</h2>
+    <div class="row" style="margin-bottom:10px">
+      <span class="pill">Einträge: <span id="entryCount" class="mono">1</span></span>
+      <span class="pill">Letzter Eintrag: <span id="lastEntry" class="mono">2026-01-21</span></span>
+      <span class="pill">localStorage Key: <span class="mono">cutbulk_2026_tracker_state</span></span>
+    </div>
+    <div style="overflow:auto; max-height: 340px;">
+      <table id="logTable">
+        <thead>
+          <tr>
+            <th>Datum</th>
+            <th>Ziel (kg)</th>
+            <th>Ist (kg)</th>
+            <th>Δ</th>
+            <th>7-Tage Ø</th>
+            <th>Taille</th>
+            <th>Steps</th>
+            <th>Kcal</th>
+            <th>Protein</th>
+            <th>Notiz</th>
+            <th>Aktion</th>
+          </tr>
+        </thead>
+        <tbody><tr><td>2026-01-21</td><td style="font-family: var(--mono);">91.0</td><td style="font-family: var(--mono);">91.0</td><td style="font-family: var(--mono);" class="good">+0.0</td><td style="font-family: var(--mono);">91.0</td><td></td><td></td><td></td><td></td><td></td><td><button class="btn danger">Entfernen</button></td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<div class="footer">
+  <p style="margin:0">
+    Legende: Δ = Ist − Ziel. <br>
+    Empfehlung: Entscheide über Änderungen (Kalorien/Schritte) anhand von <b>Trend (7-Tage Ø)</b>, nicht anhand einzelner Tage.
+  </p>
+</div>
+
+<script>
+const __EMBEDDED_STATE__ = {"milestones":[{"date":"2026-01-21","target":91},{"date":"2026-04-01","target":85},{"date":"2026-04-29","target":85},{"date":"2026-06-24","target":87.5},{"date":"2026-07-22","target":86.5},{"date":"2026-09-16","target":89},{"date":"2026-10-14","target":88},{"date":"2026-12-31","target":90}],"entries":[{"date":"2026-01-21","weight":91,"waist":null,"steps":null,"calories":null,"protein":null,"note":""}]};
+
+/** Defaults (Cut-first ab 21.01.2026) */
+const DEFAULT_MILESTONES = [
+  { date: "2026-01-21", target: 90.0 },
+  { date: "2026-04-01", target: 85.0 },
+  { date: "2026-04-29", target: 85.0 },
+  { date: "2026-06-24", target: 87.5 },
+  { date: "2026-07-22", target: 86.5 },
+  { date: "2026-09-16", target: 89.0 },
+  { date: "2026-10-14", target: 88.0 },
+  { date: "2026-12-31", target: 90.0 },
+];
+
+const STORAGE_KEY = "cutbulk_2026_tracker_state";
+
+/** State */
+let state = {
+  milestones: structuredClone(DEFAULT_MILESTONES),
+  entries: [] // {date, weight, waist, steps, calories, protein, note}
+};
+
+/** Utilities */
+function isoToday(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function parseISO(iso){ return new Date(iso + "T00:00:00"); }
+function safeNum(v){
+  if (v === "" || v === null || v === undefined) return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function round1(x){ return (Math.round(x*10)/10).toFixed(1); }
+function round2(x){ return (Math.round(x*100)/100).toFixed(2); }
+function sortMilestones(ms){ return ms.slice().sort((a,b)=> a.date.localeCompare(b.date)); }
+function sortEntries(es){ return es.slice().sort((a,b)=> a.date.localeCompare(b.date)); }
+
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function loadState(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw){
+    try{
+      const s = JSON.parse(raw);
+      if (s && Array.isArray(s.milestones) && Array.isArray(s.entries)){
+        state = s;
+        state.milestones = sortMilestones(state.milestones)
+          .filter(x=>x && typeof x.date==="string" && Number.isFinite(Number(x.target)));
+        state.entries = sortEntries(state.entries)
+          .filter(e=>e && typeof e.date==="string" && Number.isFinite(Number(e.weight)));
+        return;
+      }
+    }catch(e){}
+  }
+  if (__EMBEDDED_STATE__ && __EMBEDDED_STATE__.milestones && __EMBEDDED_STATE__.entries){
+    state = __EMBEDDED_STATE__;
+    state.milestones = sortMilestones(state.milestones);
+    state.entries = sortEntries(state.entries);
+    saveState();
+    return;
+  }
+  state = { milestones: structuredClone(DEFAULT_MILESTONES), entries: [] };
+  saveState();
+}
+
+function targetForDate(isoDate){
+  const ms = sortMilestones(state.milestones);
+  if (ms.length === 0) return null;
+  if (isoDate <= ms[0].date) return Number(ms[0].target);
+  if (isoDate >= ms[ms.length-1].date) return Number(ms[ms.length-1].target);
+
+  for (let i=0; i<ms.length-1; i++){
+    const a = ms[i], b = ms[i+1];
+    if (isoDate >= a.date && isoDate <= b.date){
+      const t0 = parseISO(a.date).getTime();
+      const t1 = parseISO(b.date).getTime();
+      const t  = parseISO(isoDate).getTime();
+      const frac = (t - t0) / (t1 - t0);
+      return Number(a.target) + frac * (Number(b.target) - Number(a.target));
+    }
+  }
+  return null;
+}
+
+function computeAvg7(isoDate){
+  const es = sortEntries(state.entries);
+  const end = parseISO(isoDate).getTime();
+  const start = end - 6*24*3600*1000;
+  const window = es.filter(e=>{
+    const t = parseISO(e.date).getTime();
+    return t >= start && t <= end && Number.isFinite(Number(e.weight));
+  }).map(e=>Number(e.weight));
+  if (window.length === 0) return null;
+  return window.reduce((a,b)=>a+b,0) / window.length;
+}
+
+function getEntryMap(){
+  const m = new Map();
+  for (const e of state.entries) m.set(e.date, e);
+  return m;
+}
+function upsertEntry(entry){
+  const es = state.entries.filter(e=> e.date !== entry.date);
+  es.push(entry);
+  state.entries = sortEntries(es);
+  saveState();
+}
+function deleteEntry(date){
+  state.entries = state.entries.filter(e=> e.date !== date);
+  saveState();
+}
+
+/** UI */
+const el = (id)=>document.getElementById(id);
+
+function renderMilestones(){
+  const tbody = el("milestoneTable").querySelector("tbody");
+  tbody.innerHTML = "";
+  const ms = sortMilestones(state.milestones);
+
+  for (const m of ms){
+    const tr = document.createElement("tr");
+
+    const tdD = document.createElement("td");
+    const inD = document.createElement("input");
+    inD.type = "date";
+    inD.value = m.date;
+    inD.addEventListener("change", ()=>{
+      m.date = inD.value;
+      state.milestones = sortMilestones(ms);
+      saveState();
+      renderAll();
+    });
+    tdD.appendChild(inD);
+
+    const tdT = document.createElement("td");
+    const inT = document.createElement("input");
+    inT.type = "number";
+    inT.step = "0.1";
+    inT.value = Number(m.target);
+    inT.addEventListener("change", ()=>{
+      const v = safeNum(inT.value);
+      if (v === null) return;
+      m.target = v;
+      saveState();
+      renderAll();
+    });
+    tdT.appendChild(inT);
+
+    const tdA = document.createElement("td");
+    const btn = document.createElement("button");
+    btn.className = "btn danger";
+    btn.textContent = "Löschen";
+    btn.addEventListener("click", ()=>{
+      if (state.milestones.length <= 2){
+        alert("Mindestens 2 Milestones nötig.");
+        return;
+      }
+      state.milestones = state.milestones.filter(x=> !(x.date===m.date && Number(x.target)===Number(m.target)));
+      if (state.milestones.length < 2){
+        state.milestones = structuredClone(DEFAULT_MILESTONES);
+      }
+      saveState();
+      renderAll();
+    });
+    tdA.appendChild(btn);
+
+    tr.appendChild(tdD);
+    tr.appendChild(tdT);
+    tr.appendChild(tdA);
+    tbody.appendChild(tr);
+  }
+}
+
+function renderLog(){
+  const tbody = el("logTable").querySelector("tbody");
+  tbody.innerHTML = "";
+  const es = sortEntries(state.entries);
+
+  el("entryCount").textContent = String(es.length);
+  el("lastEntry").textContent = es.length ? es[es.length-1].date : "—";
+
+  for (const e of es){
+    const t = targetForDate(e.date);
+    const avg7 = computeAvg7(e.date);
+    const delta = (t===null) ? null : (Number(e.weight) - t);
+
+    const tr = document.createElement("tr");
+    const cells = [
+      e.date,
+      t===null ? "—" : round1(t),
+      round1(Number(e.weight)),
+      delta===null ? "—" : (delta>=0? "+" : "") + round1(delta),
+      avg7===null ? "—" : round1(avg7),
+      e.waist ?? "",
+      e.steps ?? "",
+      e.calories ?? "",
+      e.protein ?? "",
+      e.note ?? ""
+    ];
+
+    for (let i=0;i<cells.length;i++){
+      const td = document.createElement("td");
+      td.textContent = String(cells[i] ?? "");
+      if (i===3 && delta!==null){
+        td.style.fontFamily = "var(--mono)";
+        const abs = Math.abs(delta);
+        td.className = abs <= 0.3 ? "good" : abs <= 0.8 ? "warn" : "bad";
+      }
+      if (i===1 || i===2 || i===4) td.style.fontFamily = "var(--mono)";
+      tr.appendChild(td);
+    }
+
+    const tdAct = document.createElement("td");
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn danger";
+    delBtn.textContent = "Entfernen";
+    delBtn.addEventListener("click", ()=>{
+      deleteEntry(e.date);
+      renderAll();
+    });
+    tdAct.appendChild(delBtn);
+    tr.appendChild(tdAct);
+
+    tbody.appendChild(tr);
+  }
+}
+
+function renderToday(){
+  const today = isoToday();
+  el("todayDate").textContent = today;
+
+  const t = targetForDate(today);
+  const map = getEntryMap();
+  const e = map.get(today);
+  const actual = e ? Number(e.weight) : null;
+  const delta = (t!==null && actual!==null) ? (actual - t) : null;
+  const avg7 = computeAvg7(today);
+
+  el("todayTarget").textContent = (t===null) ? "—" : (round1(t) + " kg");
+  el("todayActual").textContent = (actual===null) ? "—" : (round1(actual) + " kg");
+  const dEl = el("todayDelta");
+  dEl.className = "mono";
+  dEl.textContent = (delta===null) ? "—" : ((delta>=0? "+" : "") + round1(delta) + " kg");
+  if (delta!==null){
+    const abs = Math.abs(delta);
+    dEl.classList.add(abs <= 0.3 ? "good" : abs <= 0.8 ? "warn" : "bad");
+  }
+  el("todayAvg7").textContent = (avg7===null) ? "—" : (round1(avg7) + " kg");
+}
+
+function buildTimelineDates(){
+  const ms = sortMilestones(state.milestones);
+  const es = sortEntries(state.entries);
+  const minD = (ms[0]?.date) ?? "2026-01-21";
+  const maxD = (ms[ms.length-1]?.date) ?? "2026-12-31";
+  const start = parseISO(es.length ? (es[0].date < minD ? es[0].date : minD) : minD);
+  const end = parseISO(es.length ? (es[es.length-1].date > maxD ? es[es.length-1].date : maxD) : maxD);
+
+  const days = [];
+  const d = new Date(start.getTime());
+  while (d.getTime() <= end.getTime()){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    days.push(`${y}-${m}-${day}`);
+    d.setDate(d.getDate()+1);
+  }
+  return days;
+}
+
+function drawChart(){
+  const canvas = el("chart");
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  const padding = {l:60, r:18, t:18, b:44};
+  const plotW = W - padding.l - padding.r;
+  const plotH = H - padding.t - padding.b;
+
+  const dates = buildTimelineDates();
+  const entryMap = getEntryMap();
+
+  const seriesTarget = [];
+  const seriesActual = [];
+  const seriesAvg7 = [];
+
+  for (const d of dates){
+    seriesTarget.push(targetForDate(d));
+    const e = entryMap.get(d);
+    seriesActual.push(e ? Number(e.weight) : null);
+    seriesAvg7.push(computeAvg7(d));
+  }
+
+  const all = [];
+  for (const v of seriesTarget) if (v!==null) all.push(v);
+  for (const v of seriesActual) if (v!==null) all.push(v);
+  for (const v of seriesAvg7) if (v!==null) all.push(v);
+
+  if (all.length === 0){
+    ctx.fillStyle = "rgba(255,255,255,.7)";
+    ctx.font = "16px " + getComputedStyle(document.body).fontFamily;
+    ctx.fillText("Noch keine Daten – trag dein Gewicht ein.", padding.l, padding.t + 30);
+    return;
+  }
+
+  let yMin = Math.min(...all);
+  let yMax = Math.max(...all);
+  const pad = Math.max(0.8, (yMax - yMin) * 0.12);
+  yMin -= pad; yMax += pad;
+
+  function xAt(i){ return padding.l + (i/(dates.length-1)) * plotW; }
+  function yAt(v){ return padding.t + (1 - (v - yMin)/(yMax - yMin)) * plotH; }
+
+  // grid
+  ctx.strokeStyle = "rgba(255,255,255,.08)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  const gridN = 5;
+  for (let g=0; g<=gridN; g++){
+    const yy = padding.t + (g/gridN)*plotH;
+    ctx.moveTo(padding.l, yy);
+    ctx.lineTo(padding.l+plotW, yy);
+  }
+  ctx.stroke();
+
+  // y labels
+  ctx.fillStyle = "rgba(255,255,255,.65)";
+  ctx.font = "12px " + getComputedStyle(document.body).fontFamily;
+  for (let g=0; g<=gridN; g++){
+    const val = yMax - (g/gridN)*(yMax-yMin);
+    const yy = padding.t + (g/gridN)*plotH;
+    ctx.fillText(round1(val), 10, yy+4);
+  }
+
+  // x labels
+  ctx.fillStyle = "rgba(255,255,255,.55)";
+  const step = Math.max(20, Math.floor(dates.length/10));
+  for (let i=0; i<dates.length; i+=step){
+    const xx = xAt(i);
+    const lbl = dates[i].slice(5);
+    ctx.fillText(lbl, xx-18, padding.t+plotH+26);
+  }
+
+  function drawLine(series, stroke, width, dashed=false){
+    ctx.save();
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = width;
+    if (dashed) ctx.setLineDash([7,6]);
+    ctx.beginPath();
+    let started = false;
+    for (let i=0;i<series.length;i++){
+      const v = series[i];
+      if (v===null) { started = false; continue; }
+      const xx = xAt(i);
+      const yy = yAt(v);
+      if (!started){ ctx.moveTo(xx,yy); started=true; }
+      else { ctx.lineTo(xx,yy); }
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  drawLine(seriesTarget, "rgba(122,167,255,.95)", 2.5, false);
+  drawLine(seriesAvg7, "rgba(180,140,255,.85)", 2.0, true);
+
+  // actual points
+  ctx.fillStyle = "rgba(46, 204, 113, .95)";
+  for (let i=0;i<seriesActual.length;i++){
+    const v = seriesActual[i];
+    if (v===null) continue;
+    const xx = xAt(i);
+    const yy = yAt(v);
+    ctx.beginPath();
+    ctx.arc(xx, yy, 3.6, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  // legend
+  const lx = padding.l + 10, ly = padding.t + 14;
+  ctx.font = "12px " + getComputedStyle(document.body).fontFamily;
+
+  ctx.fillStyle = "rgba(122,167,255,.95)";
+  ctx.fillRect(lx, ly-9, 14, 3);
+  ctx.fillStyle = "rgba(255,255,255,.75)";
+  ctx.fillText("Zielpfad", lx+20, ly-6);
+
+  ctx.fillStyle = "rgba(46, 204, 113, .95)";
+  ctx.beginPath(); ctx.arc(lx+95, ly-7, 3.5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = "rgba(255,255,255,.75)";
+  ctx.fillText("Ist", lx+105, ly-6);
+
+  ctx.strokeStyle = "rgba(180,140,255,.85)";
+  ctx.lineWidth = 2;
+  ctx.setLineDash([7,6]);
+  ctx.beginPath(); ctx.moveTo(lx+150, ly-7); ctx.lineTo(lx+172, ly-7); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = "rgba(255,255,255,.75)";
+  ctx.fillText("7-Tage Ø", lx+178, ly-6);
+}
+
+function renderAll(){
+  state.milestones = sortMilestones(state.milestones);
+  state.entries = sortEntries(state.entries);
+  renderMilestones();
+  renderLog();
+  renderToday();
+  drawChart();
+}
+
+/** actions */
+function initFormDefaults(){ el("entryDate").value = isoToday(); }
+function clearEntryForm(){
+  el("entryWeight").value = "";
+  el("entryWaist").value = "";
+  el("entrySteps").value = "";
+  el("entryCalories").value = "";
+  el("entryProtein").value = "";
+  el("entryNote").value = "";
+}
+
+function csvEscape(s){
+  const str = String(s ?? "");
+  if (str.includes('"') || str.includes(",") || str.includes("\n")){
+    return '"' + str.replaceAll('"','""') + '"';
+  }
+  return str;
+}
+function downloadBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+function exportSelfContainedHtml(){
+  const html = document.documentElement.outerHTML;
+  const embedded = JSON.stringify(state);
+  const replaced = html.replace(
+    /const __EMBEDDED_STATE__ = null;[\s\S]*?\n/,
+    `const __EMBEDDED_STATE__ = ${embedded};\n`
+  );
+  const blob = new Blob([replaced], {type:"text/html"});
+  downloadBlob(blob, `cutbulk_2026_tracker_${isoToday()}.html`);
+}
+
+function bindEvents(){
+  el("saveEntryBtn").addEventListener("click", ()=>{
+    const date = el("entryDate").value;
+    const weight = safeNum(el("entryWeight").value);
+    if (!date){ alert("Bitte Datum wählen."); return; }
+    if (weight === null){ alert("Bitte Gewicht (kg) eingeben."); return; }
+
+    upsertEntry({
+      date,
+      weight,
+      waist: safeNum(el("entryWaist").value),
+      steps: safeNum(el("entrySteps").value),
+      calories: safeNum(el("entryCalories").value),
+      protein: safeNum(el("entryProtein").value),
+      note: (el("entryNote").value || "").trim()
+    });
+    renderAll();
+  });
+
+  el("clearEntryBtn").addEventListener("click", clearEntryForm);
+
+  el("addMilestoneBtn").addEventListener("click", ()=>{
+    const ms = sortMilestones(state.milestones);
+    const last = ms[ms.length-1];
+    const d = parseISO(last.date);
+    d.setDate(d.getDate() + 14);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    const nextDate = `${y}-${m}-${day}`;
+    state.milestones.push({ date: nextDate, target: Number(last.target) });
+    state.milestones = sortMilestones(state.milestones);
+    saveState();
+    renderAll();
+  });
+
+  el("resetMilestonesBtn").addEventListener("click", ()=>{
+    if (!confirm("Milestones auf Standard zurücksetzen?")) return;
+    state.milestones = structuredClone(DEFAULT_MILESTONES);
+    saveState();
+    renderAll();
+  });
+
+  el("wipeAllBtn").addEventListener("click", ()=>{
+    if (!confirm("Wirklich ALLES löschen (Entries + Milestones)?")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    state = { milestones: structuredClone(DEFAULT_MILESTONES), entries: [] };
+    saveState();
+    renderAll();
+    clearEntryForm();
+    initFormDefaults();
+  });
+
+  el("exportJsonBtn").addEventListener("click", ()=>{
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+    downloadBlob(blob, `cutbulk_2026_backup_${isoToday()}.json`);
+  });
+
+  el("exportCsvBtn").addEventListener("click", ()=>{
+    const rows = [];
+    rows.push(["date","target_kg","actual_kg","delta","avg7_kg","waist_cm","steps","calories","protein_g","note"].join(","));
+    const es = sortEntries(state.entries);
+    for (const e of es){
+      const t = targetForDate(e.date);
+      const avg7 = computeAvg7(e.date);
+      const delta = (t===null) ? "" : (Number(e.weight)-t);
+      rows.push([
+        e.date,
+        t===null ? "" : round2(t),
+        round2(Number(e.weight)),
+        delta==="" ? "" : round2(delta),
+        avg7===null ? "" : round2(avg7),
+        e.waist ?? "",
+        e.steps ?? "",
+        e.calories ?? "",
+        e.protein ?? "",
+        csvEscape(e.note ?? "")
+      ].join(","));
+    }
+    const blob = new Blob([rows.join("\n")], {type:"text/csv"});
+    downloadBlob(blob, `cutbulk_2026_log_${isoToday()}.csv`);
+  });
+
+  el("importJsonBtn").addEventListener("click", async ()=>{
+    const file = el("importJsonInput").files?.[0];
+    if (!file){ alert("Bitte zuerst eine JSON-Datei auswählen."); return; }
+    try{
+      const text = await file.text();
+      const imported = JSON.parse(text);
+      if (!imported || !Array.isArray(imported.milestones) || !Array.isArray(imported.entries)){
+        throw new Error("Ungültiges Format");
+      }
+      const ms = imported.milestones
+        .filter(x=>x && typeof x.date==="string" && Number.isFinite(Number(x.target)))
+        .map(x=>({date:x.date, target:Number(x.target)}));
+      const es = imported.entries
+        .filter(e=>e && typeof e.date==="string" && Number.isFinite(Number(e.weight)))
+        .map(e=>({
+          date: e.date,
+          weight: Number(e.weight),
+          waist: (e.waist===null || e.waist===undefined || e.waist==="") ? null : Number(e.waist),
+          steps: (e.steps===null || e.steps===undefined || e.steps==="") ? null : Number(e.steps),
+          calories: (e.calories===null || e.calories===undefined || e.calories==="") ? null : Number(e.calories),
+          protein: (e.protein===null || e.protein===undefined || e.protein==="") ? null : Number(e.protein),
+          note: (e.note ?? "")
+        }));
+      if (ms.length < 2) throw new Error("Mindestens 2 Milestones nötig.");
+      state = { milestones: sortMilestones(ms), entries: sortEntries(es) };
+      saveState();
+      renderAll();
+      alert("Import erfolgreich.");
+    }catch(err){
+      alert("Import fehlgeschlagen: " + err.message);
+    }
+  });
+
+  el("exportHtmlBtn").addEventListener("click", exportSelfContainedHtml);
+
+  window.addEventListener("resize", ()=> drawChart());
+}
+
+/** boot */
+(function(){
+  loadState();
+  bindEvents();
+  initFormDefaults();
+  renderAll();
+})();
+</script>
+
+
+</body></html>
